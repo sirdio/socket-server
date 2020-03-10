@@ -4,7 +4,9 @@ import bodyParser       from 'body-parser';
 import cors             from 'cors';
 import { SERVER_PORT  } from "./global/enviroment";
 
-const server = new Server();
+//cambio el codigo de la linea 8 por la linea 9
+//const server = new Server();
+const server = Server.instance;
 
 
 //// configuramos body-parser
