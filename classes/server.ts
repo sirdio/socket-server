@@ -4,7 +4,9 @@ import { SERVER_PORT } from '../global/enviroment';
 import socketIO from 'socket.io';
 import http from 'http';
 import * as socket from '../sockets/sockets'
-import { Socket } from 'socket.io';
+
+//estaimportacion no se utliza porque lo centralizamos en el archivo socket
+//import { Socket } from 'socket.io';
 
 
 
@@ -14,7 +16,6 @@ export default class Server{
     public app: express.Application;
     
     public port: number;
-    
     public io: socketIO.Server;
     private httpServer: http.Server;
     
@@ -24,7 +25,7 @@ export default class Server{
         this.port = SERVER_PORT;
         ////
         //como no se puede configurar express con socket.io es necesario
-        //importar http relacionar express con socket
+        //importar http para relacionar express con socket
         ////
         ///inicializamos el httpServer
         this.httpServer = new http.Server( this.app );
@@ -33,16 +34,25 @@ export default class Server{
         this.io = socketIO( this.httpServer );
         this.escucharSockets();
     }
-    
+
+    ///patron singleton
     public static get instance(  ) {
         return this._instance || ( this._instance = new this() );
     }
 
     //método o funcion privada para escuchar los socckets
+    //es aqui donde se conecta un cliente
     private escucharSockets(){
         console.log( 'Escuchando conexiones - Sockets' );
         this.io.on('connection', (cliente) => { 
-            console.log( 'Cliente conectado' );
+            
+            //conectar cliente "usuario"
+            socket.conectarCliente( cliente );
+            //configurar Usuario
+
+            socket.configurarUsuario( cliente, this.io );
+
+            
             //mensajes
             socket.mensaje( cliente, this.io );
             //desconectar
