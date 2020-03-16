@@ -33,7 +33,9 @@ export class UsuariosLista {
 
     //obtener lista de usuarios conectados
     public getLista(){
-        return this.lista;
+        return this.lista.filter( ( usuario ) => { 
+            return usuario.nombre !== 'sin-nombre';
+         } );
     }
 
     //obtener un usuario

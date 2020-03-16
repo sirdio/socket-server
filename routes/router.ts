@@ -1,14 +1,62 @@
 import { Router, Request, Response } from 'express';
 import Server from '../classes/server';
+import mysqlConexion from '../DB/database'
+import { usuariosConectados } from '../sockets/sockets';
+
+
 
 ///exportar router desde expres
 const router = Router();
+const mysqldb = mysqlConexion;
 
 
+////// peticiones get y post DB
+router.get('/usuariosDB', (req: Request, res: Response) => { 
+    
+    mysqlConexion.query( 'Select * from usuarios', ( err, row, field ) => { 
+        if (!err) {
+            res.status(200).json({
+                ok: true,
+                usuario: row
+            })
+        } else {
+            res.status(400).json({
+                ok: false,
+                mensaje: `Se produjo un ${ err }`
+            })
+        }
+     } );
+ });
 
+///Servicios para obtener lista de ID de usuarios conectados
+router.get('/usuarios', (req: Request, res: Response) => { 
+    const server = Server.instance;
+    server.io.clients( ( err: any, clientes: string[] ) => { 
+        if (err) {
+            res.status(400).json({
+                ok: false,
+                mensaje: `Se produjo un ${ err }`
+            });
+        } else {
+            res.status(200).json({
+                ok: true,
+                clientesconectado: clientes
+                
+            });
+        }        
+     } );
+ });
 
+ /// permite obtener los usuarios conectados con sus nombre y salas
+ router.get('/usuarios/detalle', (req: Request, res: Response) => { 
+     
+            res.status(200).json({
+                ok: true,
+                usuariosConectado: usuariosConectados.getLista()                
+            });
+ });
 
-/// peticiones get y post
+/// peticiones get & post
 router.get('/mensajes', (req: Request, res: Response) => { 
     res.json({
         ok:true,
